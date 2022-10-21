@@ -1,6 +1,6 @@
 # Django School
 
-It is an application built with Django to create, read, update, and delete students from a json file in the backend server.
+It is an application built with Django to create, read, update, and delete students from the database in the backend server.
 
 # How to run it
 
