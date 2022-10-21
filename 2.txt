@@ -1,0 +1,20 @@
+python manage.py startapp users -> create a new app called users
+then add it in settings.py INSTALLED_APPS
+## Admin
+python manage.py createsuperuser
+>> admin.site.register.(Persons)
+
+## urls.py
+map urls & routes to views
+- created inside server and inside application
+
+## postman - rest - curl
+
+## endpoints
+path("<int:id>", update_delete)
+
+## json
+json.loads(request.body)
+
+## Responses
+HttpResponse(..), JsonResponse(..)
