@@ -1,67 +1,40 @@
 from django.shortcuts import render, HttpResponse
 from django.http import JsonResponse
-
+from django.views import View
+from .models import Student
 import json
 
-def readFile() -> list:
-    f = open('student/student.json', 'r')
-    data = json.loads(f.read())
-    f.close()
-    return data
-# Create your views here.
-# GET Request
-def index(request):
-    if(request.method=='GET'):
-        data = readFile()
-        return JsonResponse(data, safe=False)
-    else:
-        return HttpResponse("Invalid Request")
+# student without id
 
-# POST Request
-def create(request):
-    if(request.method=='POST'):
-        data = readFile()
-        data.append(json.loads(request.body))
-        with open('student/student.json', 'w') as f:
-            f.write(json.dumps(data))
-        return JsonResponse(data, safe=False)
-    else:
-        return HttpResponse("Invalid Request")
 
-# PUT Request
-def update(request):
-    if(request.method=='PUT'):
-        newData = json.loads(request.body)
-        data = readFile()
-        index = -1
-        for i in range(len(data)):
-            if(data[i]['id']==newData['id']):
-                index = i
-                break
-        if(index!=-1):
-            data[index] = newData
-        else:
-            data.append(newData)
-        with open('student/student.json', 'w') as f:
-            f.write(json.dumps(data))
+class Student1(View):
+    def get(self, request):
+        data = list(Student.objects.all().values())
         return JsonResponse(data, safe=False)
-    else:
-        return HttpResponse('Invalid Request')
 
-# DELETE Request
-def remove(request):
-    if(request.method=='DELETE'):
-        data = readFile()
-        id = json.loads(request.body)['id']
-        index = -1
-        for i in range(len(data)):
-            if data[i]['id']==id:
-                index = i
-                break
-        if(index!=-1):
-            data.pop(index)
-            with open('student/student.json', 'w') as f:
-                f.write(json.dumps(data))
+    def post(self, request):
+        data = json.loads(request.body)
+        Student.objects.create(**data)
+        return JsonResponse({'message': 'Student created successfully',
+                             'data': list(Student.objects.all().values())}, status=201)
+
+
+# Student with id
+class Student2(View):
+    def get(self, request, *args, **kwargs):
+        id = kwargs['id']
+        data = list(Student.objects.filter(id=id).values())
         return JsonResponse(data, safe=False)
-    else:
-        return HttpResponse('Invalid Request')
+
+    def put(self, request, *args, **kwargs):
+        id = kwargs['id']
+        data = json.loads(request.body)
+        Student.objects.filter(id=id).update(**data)
+        return JsonResponse({'message': 'Student updated successfully',
+                             'data': list(Student.objects.filter(id=id).values())}, status=201)
+
+    def delete(self, request, *args, **kwargs):
+        id = kwargs['id']
+        Student.objects.get(id=id).delete()
+        assert(Student.objects.filter(id=id).count() == 0)
+        return JsonResponse({'message': 'Student deleted successfully', }, status=201)

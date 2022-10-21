@@ -1,9 +1,7 @@
 
 from django.urls import path
-from .views import index, create, update, remove
+from .views import Student1, Student2
 urlpatterns = [
-    path("", index),
-    path("add/", create),
-    path("change/", update),
-    path("remove/", remove)
+    path("", Student1.as_view()),
+    path("<int:id>", Student2.as_view()),
 ]
