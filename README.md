@@ -12,14 +12,12 @@ It is an application built with Django to create, read, update, and delete stude
 
 # Endpoints:
 
-* `http://127.0.0.1:8000/api/` to GET students in the json file
-    * No body required for this request
-* `http://127.0.0.1:8000/api/add` to POST a student to the json file
-    * Example for the body: {"id": 1, "name": "Mohamed", "age": 32, "class": "F"}
-* `http://127.0.0.1:8000/api/change` to PUT a student to the json file
-    * It will update the student with the existing ID, if the ID doesn't exist it will create it.
-    * Example for the body: {"id": 1, "name": "Saad", "age": 23, "class": "H"}
-* `http://127.0.0.1:8000/api/remove` to DELETE a student from the json file
-    * Example for the body: {"id":1}
+* `http://127.0.0.1:8000/api/` 
+  * GET: retrieve all the database
+  * POST: create a new student with the given json body
+* `http://127.0.0.1:8000/api/4` 
+  * GET: retrive student with id = 4
+  * PUT: change data of studetnt with id = 4
+  * DELETE: delete student with id = 4
 
 You can use Postman to send requests
