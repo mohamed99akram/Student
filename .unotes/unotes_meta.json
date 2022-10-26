@@ -1,0 +1,34 @@
+{
+  "name": "",
+  "isOrdered": true,
+  "folders": {
+    "server": {
+      "name": "server",
+      "isOrdered": true,
+      "folders": {},
+      "files": {}
+    },
+    "student": {
+      "name": "student",
+      "isOrdered": true,
+      "folders": {
+        "migrations": {
+          "name": "migrations",
+          "isOrdered": true,
+          "folders": {},
+          "files": {}
+        },
+        "__pycache__": {
+          "name": "__pycache__",
+          "isOrdered": true,
+          "folders": {},
+          "files": {}
+        }
+      },
+      "files": {}
+    }
+  },
+  "files": {
+    "README": 0
+  }
+}

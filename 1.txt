@@ -1,0 +1,6 @@
+poetry init -> create toml file
+poetry shell -> crete venv
+poetry add django
+ ----
+django-admin startproject server . = to create server
+python manage.py runserver 8000

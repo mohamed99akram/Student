@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "student"
+version = "0.1.0"
+description = ""
+authors = ["mohamed99akram <mohamed1999akram@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+django = "^4.1.2"
+python-decouple = "^3.6"
+djangorestframework = "^3.14.0"
+markdown = "^3.4.1"
+django-filter = "^22.1"
+drf-yasg = "^1.21.4"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
