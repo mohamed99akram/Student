@@ -7,19 +7,27 @@ It is an application built with Django to create, read, update, and delete stude
 * Clone this repository
 * install django & poetry
 * run `poetry shell`
-* run `poetry add django`
+* run `poetry install`
 * run `python manage.py runserver 8000`
 
 # Endpoints:
+Using mixins:
+* `http://127.0.0.1:8000/api/students` 
+  * GET, POST
+* `http://127.0.0.1:8000/api/students/2` 
+  * GET, PUT, DELETE
 
-* `http://127.0.0.1:8000/api/` 
-  * GET: retrieve all the database
-  * POST: create a new student with the given json body
-    * first_name and last_name should start with a capital letter
-    * email should be in the format a@b.c
-* `http://127.0.0.1:8000/api/4` 
-  * GET: retrive student with id = 4
-  * PUT: change data of studetnt with id = 4
-  * DELETE: delete student with id = 4
+Using APIView:
+* `http://127.0.0.1:8000/api/parents` 
+  * GET, POST
+* `http://127.0.0.1:8000/api/parents/2` 
+  * GET, PUT, DELETE
 
-You can use Postman to send requests
+Using generics:
+* `http://127.0.0.1:8000/api/subjects` 
+  * GET, PUT
+* `http://127.0.0.1:8000/api/subjects/2` 
+  * GET, PUT, DELETE
+
+API Documentation:
+`http://127.0.0.1:8000/swagger/`

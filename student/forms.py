@@ -23,7 +23,7 @@ class StudentForm(forms.ModelForm):
     first_name = forms.CharField(max_length=100, validators=[check_first_name])
     last_name = forms.CharField(max_length=100, validators=[check_last_name])
     email = forms.CharField(max_length=100, validators=[check_email])
-    
+
     class Meta:
         model = Student
         fields = "__all__"
