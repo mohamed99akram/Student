@@ -46,10 +46,10 @@ class Subject(models.Model):
 
 class Student(User):
     id = models.AutoField(primary_key=True)
-    first_name = models.CharField(max_length=200)
-    last_name = models.CharField(max_length=200)
-    age = models.IntegerField()
-    student_class = models.IntegerField()
+    first_name = models.CharField(max_length=200, null=True)
+    last_name = models.CharField(max_length=200, null=True)
+    age = models.IntegerField(null=True)
+    student_class = models.IntegerField(null=True)
 
     # user_data = models.OneToOneField(User, on_delete=models.CASCADE)
 

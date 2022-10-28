@@ -29,6 +29,7 @@ class ParentSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField(max_length=100, validators=[check_name])
     last_name = serializers.CharField(max_length=100, validators=[check_name])
     students = StudentListSerializer(many=True, read_only=True)
+
     class Meta:
         model = Parent
         fields = '__all__'
@@ -57,8 +58,12 @@ class SubjectSerializer2(serializers.ModelSerializer):
 
 
 class StudentSerializer(serializers.ModelSerializer):
-    first_name = serializers.CharField(max_length=100, validators=[check_name])
-    last_name = serializers.CharField(max_length=100, validators=[check_name])
+    first_name = serializers.CharField(max_length=100, validators=[
+                                       check_name], required=False)
+    last_name = serializers.CharField(max_length=100, validators=[
+                                      check_name], required=False)
+    age = serializers.IntegerField(required=False)
+    student_class = serializers.IntegerField(required=False)
     parent = ParentSerializer2(read_only=True)
     subjects = SubjectSerializer2(many=True, read_only=True)
     # like forms

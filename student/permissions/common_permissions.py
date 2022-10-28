@@ -94,7 +94,6 @@ class UserPermissions(permissions.BasePermission):
         self.model = None
 
     def has_permission(self, request, view):
-        print('entered has permission')
         token = request.headers.get('token')
         self.message = 'You do not have access 1'
         try:
@@ -112,7 +111,6 @@ class UserPermissions(permissions.BasePermission):
 
     # For PUT, PATCH , DELETE
     def has_object_permission(self, request, view, obj):
-        print('entered has object permission')
         try:
             user = self.model.objects.get(id=view.kwargs[self.id])
             if type(user) is not dict:

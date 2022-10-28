@@ -71,9 +71,36 @@ class StudentDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Student.objects.all()
     serializer_class = StudentSerializer
     permission_classes = [StudentPermissions]
-    def f(self):
-        self.check_permissions()
-        self.check_object_permissions()
+
+    def update(self, request, *args, **kwargs):
+        response = super().update(request, *args, **kwargs)
+        token_id = response.data['token']
+        try:
+            token = Token.objects.get(id=token_id)
+        except:
+            raise exceptions.AuthenticationFailed(
+                {'message': 'Token was not updated'})
+
+        return Response({'message': 'Student updated successfully', 'token': token.token}, status=status.HTTP_201_CREATED)
+
+    def perform_update(self, serializer):
+        print(serializer.instance.__dict__)
+        if 'username' not in self.request.data and 'password' not in self.request.data:
+            return super().perform_update(serializer)
+        token_id = serializer.instance.token_id
+        user_data = self.request.data
+        new_token = generateToken(user_data['username'], user_data['password'])
+        try:
+            token_obj = Token.objects.get(id=token_id)
+            token_obj.token = new_token
+            token_obj.save()
+        except Exception as e:
+            print(e)
+            raise exceptions.AuthenticationFailed(
+                {'message': 'Token was not updated'})
+        serializer.validated_data.update(token=token_obj)
+        return super().perform_update(serializer)
+
 class ParentSignIn(APIView):
     # authentication_classes = [CheckParentSignin2]
     @CheckUserSignIn(cl=Parent)
