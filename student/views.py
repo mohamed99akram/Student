@@ -4,16 +4,59 @@ from django.views import View
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from student.permissions.parent_permissions import CheckParentSignin, ParentPermissions, CheckParentRegister
+from student.permissions.student_permissions import *
 
 from student.serializers import StudentSerializer, SubjectSerializer, ParentSerializer
-from .models import Student, Subject, Parent
+from .models import Student, Subject, Parent, Token, User
 
 from rest_framework import mixins, generics, status
+import json
+from .common import generateToken
 
-
+# Student Register
 class StudentView(generics.ListCreateAPIView):
     queryset = Student.objects.all()
     serializer_class = StudentSerializer
+    authentication_classes = [CheckStudentRegister]
+    # CheckSutdentRegister.authenticate -> perform_create -> create
+
+    def create(self, request, *args, **kwargs):
+        response = super().create(request, *args, **kwargs)
+        token_id = response.data['token']
+        try:
+            token = Token.objects.get(id=token_id)
+        except:
+            raise exceptions.AuthenticationFailed(
+                {'message': 'Token was not created'})
+        
+        return Response({'message': 'Student created successfully', 'token': token.token}, status=status.HTTP_201_CREATED)
+
+    def perform_create(self, serializer):
+        user_data = self.request.data
+        encoded_jwt = generateToken(
+            user_data['username'], user_data['password'])
+        p = None
+        if 'parent_id' in user_data:
+            try:
+                parent_id = user_data['parent']
+                p = Parent.objects.get(id=parent_id)
+            except Parent.DoesNotExist:
+                raise exceptions.AuthenticationFailed(
+                    {'message': 'No parent with this id'})
+        if 'parent_username' in user_data:
+            try:
+                parent_username = user_data['parent_username']
+                p = Parent.objects.get(username=parent_username)
+            except Parent.DoesNotExist:
+                raise exceptions.AuthenticationFailed(
+                    {'message': 'No parent with this username'})
+
+        user_token = Token.objects.create(token=encoded_jwt)
+        serializer.validated_data.update(token=user_token)
+        if p is not None:
+            serializer.validated_data.update(parent=p)
+        return super().perform_create(serializer)
 
 
 class StudentDetailView(generics.RetrieveUpdateDestroyAPIView):
@@ -21,22 +64,48 @@ class StudentDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = StudentSerializer
 
 
-class ParentView(APIView):
-    def get(self, request):
-        data = ParentSerializer(Parent.objects.all(), many=True)
-        return Response(data.data)
+class ParentSignIn(APIView):
+    # authentication_classes = [CheckParentSignin2]
+    @CheckParentSignin
+    def post(self, request, *args, **kwargs):
+        # user_name = request.data['username']
+        # encoded_jwt = generateToken(user_name, request.data['password'])
+        # token_id = Parent.objects.get(username=user_name).token_id
+        # token = Token.objects.get(id=token_id)
+        # token.token = encoded_jwt
+        # token.save()
+        # return Response({'msg': 'User Signed in Sucessfully', 'token':encoded_jwt})
+        user_token = kwargs['user_token']
+        return Response({'msg': 'User Signed in Sucessfully', 'token': user_token.token})
 
-    def post(self, request):
-        serializer = ParentSerializer(data=request.data)
+
+class ParentView(APIView):
+    # def get(self, request):
+    #     data = ParentSerializer(Parent.objects.all(), many=True)
+    #     return Response(data.data)
+
+    authentication_classes = [CheckParentRegister]
+
+    def post(self, request, *args, **kwargs):
+        # Create a new token
+        encoded_jwt = generateToken(
+            request.data['username'], request.data['password'])
+        user_token = Token.objects.create(token=encoded_jwt)
+        # user_token = kwargs['user_token']
+        serializer = ParentSerializer(
+            data={**request.data, 'token': user_token.id})
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data)
+            # return Response(serializer.data)
+            return Response({'msg': 'User Created Sucessfully', 'token': user_token.token})
         else:
             return Response(serializer.errors)
 
 
 class ParentDetailView(APIView):
-    def put(self, request, id): 
+    permission_classes = [ParentPermissions]
+
+    def put(self, request, id):
         serializer = ParentSerializer(
             data=request.data, instance=Parent.objects.get(id=id))
         if serializer.is_valid():
@@ -45,7 +114,7 @@ class ParentDetailView(APIView):
         else:
             return Response(serializer.errors)
 
-    def get(self, request, id): 
+    def get(self, request, id):
         try:  # use it to avoid get errors
             serializer = ParentSerializer(Parent.objects.get(id=id))
             return Response(serializer.data)

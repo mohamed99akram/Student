@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Student, Parent, Subject
+from .models import Student, Parent, Subject, User, Token
 from django.forms import ValidationError
 import re
 
@@ -9,9 +9,14 @@ def check_name(value: str):
         raise ValidationError('first_name should start with a Capital letter')
 
 
-def check_email(value):
-    if re.match(r'[^@]+@[^@]+\.[^@]+', value) is None:
-        raise ValidationError('Email is not valid')
+# def check_email(value):
+#     if re.match(r'[^@]+@[^@]+\.[^@]+', value) is None:
+#         raise ValidationError('Email is not valid')
+
+class TokenSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Token
+        fields = ['token']
 
 
 class StudentListSerializer(serializers.ModelSerializer):
@@ -24,7 +29,6 @@ class ParentSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField(max_length=100, validators=[check_name])
     last_name = serializers.CharField(max_length=100, validators=[check_name])
     students = StudentListSerializer(many=True, read_only=True)
-
     class Meta:
         model = Parent
         fields = '__all__'
@@ -55,7 +59,6 @@ class SubjectSerializer2(serializers.ModelSerializer):
 class StudentSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField(max_length=100, validators=[check_name])
     last_name = serializers.CharField(max_length=100, validators=[check_name])
-    email = serializers.CharField(max_length=100, validators=[check_email])
     parent = ParentSerializer2(read_only=True)
     subjects = SubjectSerializer2(many=True, read_only=True)
     # like forms
