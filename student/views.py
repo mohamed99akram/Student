@@ -4,15 +4,23 @@ from django.views import View
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from student.permissions.parent_permissions import CheckParentSignin, ParentPermissions, CheckParentRegister
-from student.permissions.student_permissions import *
+from student.permissions.common_permissions import CheckUserSignIn
+from student.permissions.parent_permissions import ParentPermissions, CheckParentRegister
+from student.permissions.student_permissions import StudentPermissions, CheckStudentRegister
 
 from student.serializers import StudentSerializer, SubjectSerializer, ParentSerializer
 from .models import Student, Subject, Parent, Token, User
 
-from rest_framework import mixins, generics, status
+from rest_framework import mixins, generics, status, exceptions
 import json
 from .common import generateToken
+
+
+class StudentSignIn(APIView):
+    @CheckUserSignIn(cl=Student)
+    def post(self, request, *args, **kwargs):
+        user_token = kwargs['user_token']
+        return Response({'msg': 'User Signed in Sucessfully', 'token': user_token.token})
 
 # Student Register
 class StudentView(generics.ListCreateAPIView):
@@ -29,7 +37,7 @@ class StudentView(generics.ListCreateAPIView):
         except:
             raise exceptions.AuthenticationFailed(
                 {'message': 'Token was not created'})
-        
+
         return Response({'message': 'Student created successfully', 'token': token.token}, status=status.HTTP_201_CREATED)
 
     def perform_create(self, serializer):
@@ -62,11 +70,13 @@ class StudentView(generics.ListCreateAPIView):
 class StudentDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Student.objects.all()
     serializer_class = StudentSerializer
-
-
+    permission_classes = [StudentPermissions]
+    def f(self):
+        self.check_permissions()
+        self.check_object_permissions()
 class ParentSignIn(APIView):
     # authentication_classes = [CheckParentSignin2]
-    @CheckParentSignin
+    @CheckUserSignIn(cl=Parent)
     def post(self, request, *args, **kwargs):
         # user_name = request.data['username']
         # encoded_jwt = generateToken(user_name, request.data['password'])

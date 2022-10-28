@@ -1,12 +1,11 @@
 
 from django.urls import path, include
-from .views import StudentView, StudentDetailView,\
-    ParentView, ParentDetailView, SubjectView, SubjectDetailView,\
-        ParentSignIn
+from .views import *
 
 urlpatterns = [
     path("students/", include([
         path("register", StudentView.as_view()),
+        path("signin", StudentSignIn.as_view()),
         path("<int:pk>", StudentDetailView.as_view()),
     ])),
     path("parents/", include([
